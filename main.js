@@ -5,7 +5,9 @@
 *	https://github.com/fooey/node-gw2
 *   http://wiki.guildwars2.com/wiki/API:Main
 *
+
 */
+var request = require('superagent');
 
 
 
@@ -130,10 +132,10 @@ function getMatchesState(params, callback) {
 		params = {};
 	}
 
-	var requestUrl = endPoints['matchesState'];
+	var requestUrl = endPoints.matchesState;
 
 	if (params.match_id) {
-		requestUrl += '' + match_id;
+		requestUrl += ('' + params.match_id);
 	}
 
 	get(requestUrl, {}, callback);
@@ -142,7 +144,7 @@ function getMatchesState(params, callback) {
 
 // REQUIRED: match_id || world_slug
 function getMatchDetailsState(params, callback) {
-	var requestUrl = endPoints['matchDetailsState'];
+	var requestUrl = endPoints.matchDetailsState;
 
 	if (!params.match_id && !params.world_slug) {
 		throw ('Either match_id or world_slug must be passed');
@@ -319,7 +321,12 @@ function getFile(params, callback) {
 		throw ('format is a required parameter');
 	}
 
-	requestJson(getFileRenderUrl(params), callback);
+
+	request
+		.get(getFileRenderUrl(params))
+		.end(function(err, data) {
+			callback(err, parseJson(data.text));
+		});
 }
 
 
@@ -360,9 +367,12 @@ function get(key, params, callback) {
 	params = params || {};
 
 	var apiUrl = getApiUrl(key, params);
-	var getData = require('./lib/getData.js');
 
-	getData(apiUrl, callback);
+	request
+		.get(apiUrl)
+		.end(function(err, data) {
+			callback(err, parseJson(data.text));
+		});
 }
 
 
@@ -370,7 +380,7 @@ function get(key, params, callback) {
 function getApiUrl(requestUrl, params) {
 	var qs = require('querystring');
 
-	var requestUrl = (endPoints[requestUrl])
+	requestUrl = (endPoints[requestUrl])
 		? endPoints[requestUrl]
 		: requestUrl;
 
@@ -381,5 +391,17 @@ function getApiUrl(requestUrl, params) {
 	}
 
 	return requestUrl;
+}
+
+
+function parseJson(data) {
+	var results;
+
+	try {
+		results = JSON.parse(data);
+	}
+	catch (e) {}
+
+	return results;
 }
 
