@@ -57,7 +57,7 @@ module.exports = {
 
 var endPoints = {
 	worldNames: 'https://api.guildwars2.com/v2/worlds',							// https://api.guildwars2.com/v2/worlds?page=0
-	colors: 'https://api.guildwars2.com/v1/colors.json',						// http://wiki.guildwars2.com/wiki/API:1/colors
+	colors: 'https://api.guildwars2.com/v2/colors',								// http://wiki.guildwars2.com/wiki/API:1/colors
 	guildDetails: 'https://api.guildwars2.com/v1/guild_details.json',			// http://wiki.guildwars2.com/wiki/API:1/guild_details
 
 	items: 'https://api.guildwars2.com/v1/items.json',							// http://wiki.guildwars2.com/wiki/API:1/items
@@ -173,7 +173,7 @@ function getWorldNames(params, callback) {
 	}
 
 	if (!params.ids) {
-		params.page = 0;
+		params.ids = 'all';
 	}
 	else if (Array.isArray(params.ids)) {
 		params.ids = params.ids.join(',');
@@ -288,6 +288,9 @@ function getColors(params, callback) {
 	if (typeof params === 'function') {
 		callback = params;
 		params = {};
+	}
+	if (!params.ids) {
+		params.ids = 'all';
 	}
 	get('colors', params, callback);
 }
